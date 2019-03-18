@@ -1,21 +1,16 @@
-# Teeny-tiny matplotlib image based on alpine
-FROM czentye/matplotlib-minimal:3.0.3
+FROM ubuntu:16.04
 
-LABEL author="Phil Ewels" \
-      description="MultiQC" \
-      maintainer="phil.ewels@scilifelab.se"
+LABEL author="Kersten Breuer, Zeller Team, EMBL 2017" \
+    maintainer="kersten-breuer@outlook.com"
 
+# Install essential unix packages and dependencies:
+RUN apt-get update -y --fix-missing
+RUN apt-get install -y build-essential \
+    python-dev \
+    python-pip
 
-# Add the MultiQC source files to the container
-ADD . /usr/src/multiqc
-WORKDIR /usr/src/multiqc
+## Install MultiQC:
+ENV MULTIQC_VERSION 1.7
+RUN pip install multiqc==${MULTIQC_VERSION}
 
-# Remove matplotlib requirement needed for py2 support
-# TODO: We can get rid of this when MultiQC is py3 only
-RUN sed -i 's/matplotlib>=2.1.1,<3.0.0/matplotlib>=2.1.1/g' setup.py
-
-# Install MultiQC
-RUN python setup.py install
-
-# Set up entrypoint and cmd for easy docker usage
 ENTRYPOINT [ "multiqc" ]
